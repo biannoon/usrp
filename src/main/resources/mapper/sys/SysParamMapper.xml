@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrcu.sys.mapper.SysParamMapper">
+    <resultMap id="BaseResultMap" type="com.scrcu.sys.entity.SysParam">
+        <result column="param_id" property="paramId"></result>
+        <result column="param_nm" property="paramNm"></result>
+        <result column="param_value" property="paramValue"></result>
+        <result column="param_comnt" property="paramComnt"></result>
+        <result column="param_typ" property="paramTyp"></result>
+    </resultMap>
+
+
+    <select id="listSysParamByTyp" resultMap="BaseResultMap" parameterType="string">
+      select param_id,param_nm,param_value,param_comnt,param_typ from sys_param where param_typ=#{paramTyp}
+    </select>
+
+
+
+</mapper>

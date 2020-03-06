@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrcu.sys.mapper.SysOrganizationMapper">
+
+    <resultMap id="SysOrganization" type="com.scrcu.sys.entity.SysOrganization">
+        <result property="id" column="org_id"></result>
+        <result property="name" column="org_nm"></result>
+        <result property="superiorId" column="spr_org_id"></result>
+        <result property="gradationCode" column="org_grdtn_cd"></result>
+    </resultMap>
+
+    <select id="getTreeTypeFromDictryCd" parameterType="com.scrcu.sys.entity.SysDictryCd" resultType="com.scrcu.sys.entity.SysDictryCd">
+        select
+        dictry_id,
+        dictry_nm,
+        pare_dictry_id,
+        blngto_dictry_id,
+        cd_typ,
+        dictry_comnt
+        from sys_dictry_cd
+        <where>
+            1 = 1
+            <if test="blngtoDictryId != null and blngtoDictryId != ''">
+                and blngto_dictry_id = #{blngtoDictryId}
+            </if>
+            <if test="pareDictryId != null and pareDictryId != ''">
+                and pare_dictry_id = #{pareDictryId}
+            </if>
+            <if test="dictryId != null and dictryId != ''">
+                and dictry_id = #{dictryId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getSysOrgSbmtdTree" parameterType="com.scrcu.sys.entity.SysOrgSbmtdTree" resultType="com.scrcu.sys.entity.SysOrgSbmtdTree">
+        select
+            org_id,
+            tree_typ,
+            org_nm,
+            spr_org_id,
+            org_seq
+        from sys_org_sbmtd_tree
+        <where>
+            1 = 1
+            <if test="treeTyp != null and treeTyp != ''">
+                and tree_typ = #{treeTyp}
+            </if>
+            <if test="sprOrgId != null and sprOrgId != ''">
+                and spr_org_id = #{sprOrgId}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getSysOrgInfoFromSbmtedTree" parameterType="com.scrcu.sys.entity.SysOrgSbmtdTree" resultMap="SysOrganization">
+        select
+            a.org_id,
+            a.org_nm,
+            a.spr_org_id,
+            org_grdtn_cd
+        from sys_org_info as a left join sys_org_sbmtd_tree as b on a.org_id = b.org_id
+        <where>
+            <if test="treeTyp != null and treeTyp != ''">
+                and b.tree_typ = #{treeTyp}
+            </if>
+            <if test="sprOrgId != null and sprOrgId != ''">
+                and b.spr_org_id = #{sprOrgId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getSysOrgInfoByOrgLimits" parameterType="com.scrcu.sys.entity.SysOrgSbmtdTree" resultMap="SysOrganization">
+        select
+        a.org_id,
+        a.org_nm,
+        a.spr_org_id,
+        org_grdtn_cd
+        from sys_org_info as a left join sys_org_sbmtd_tree as b on a.org_id = b.org_id
+        <where>
+            <if test="treeType != null and treeType != ''">
+                and b.tree_typ = #{treeType}
+            </if>
+            <if test="sprOrgId != null and sprOrgId != ''">
+                and b.spr_org_id = #{sprOrgId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getSysOrgInfoFromUser" parameterType="com.scrcu.sys.entity.SysUser" resultMap="SysOrganization">
+        select
+        org_id,
+        org_nm,
+        spr_org_id,
+        org_grdtn_cd
+        from (select DISTINCT(RECOURS_ID) from sys_user_group_rel as a LEFT JOIN sys_group_recours_rel as b on a.GROUP_ID=b.GROUP_ID where a.USER_ID=#{userId} and b.RECOURS_TYP="SYS1101") as d
+        LEFT JOIN sys_org_info as c on c.org_id=d.RECOURS_ID
+    </select>
+
+    <select id="getSysOrgInfoByList" parameterType="java.util.List" resultMap="SysOrganization">
+        SELECT
+        org_id,
+        org_nm,
+        spr_org_id,
+        org_grdtn_cd
+    FROM
+        sys_org_info
+    WHERE
+        org_grdtn_cd IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getSingleSysOrgInfoByOrgGrdtnCd" parameterType="com.scrcu.sys.entity.SysOrganization" resultMap="SysOrganization">
+        SELECT org_id, org_nm, spr_org_id, org_grdtn_cd FROM sys_org_info where org_grdtn_cd=#{gradationCode}
+    </select>
+
+    <select id="getSysOrgInfoByOrgCd" parameterType="java.lang.String" resultMap="SysOrganization">
+        select org_id, org_nm, spr_org_id, org_grdtn_cd from sys_org_info where org_cd=#{org_cd}
+    </select>
+
+</mapper>

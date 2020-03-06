@@ -1,0 +1,30 @@
+/*页面容器*/
+.container-area{
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+/*查询表单 容器*/
+.query-area {
+    padding: 0;
+    width: auto;
+    margin-bottom: 16px;
+}
+
+/*详情表单 容器*/
+.detail-area {
+    padding: 5px;
+    width: auto;
+    margin-bottom: 16px;
+}
+
+/*详情表单 按钮容器*/
+.btn-area {
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform: translateX(-50%);
+    text-align: center;
+}

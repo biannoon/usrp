@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrcu.sys.mapper.SysDictryCdMapper">
+    <resultMap id="BaseResultMap" type="com.scrcu.sys.entity.SysDictryCd">
+        <result column="dictry_id" property="dictryId"></result>
+        <result column="dictry_nm" property="dictryNm"></result>
+        <result column="pare_dictry_id" property="pareDictryId"></result>
+        <result column="blngto_dictry_id" property="blngtoDictryId"></result>
+        <result column="cd_typ" property="cdTyp"></result>
+        <result column="dictry_comnt" property="dictryComnt"></result>
+    </resultMap>
+
+
+
+    <resultMap id="DrawResultMap" type="com.scrcu.sys.entity.SysDictryCdResult">
+        <result column="dictryId" property="dictryId"></result>
+        <result column="tableEnNm" property="tableEnNm"></result>
+        <result column="tableCnNm" property="tableCnNm"></result>
+        <result column="dataSorcId" property="dataSorcId"></result>
+        <result column="fieldEnNm" property="fieldEnNm"></result>
+        <result column="fieldCnNm" property="fieldCnNm"></result>
+    </resultMap>
+
+    <select id="getSysDictryCdByDicId" resultMap="BaseResultMap" parameterType="string">
+        select dictry_id,dictry_nm,pare_dictry_id,blngto_dictry_id,cd_typ,dictry_comnt
+        from sys_dictry_cd where dictry_id=#{dictryId} and blngto_dictry_id = #{blngtoDictryId}
+    </select>
+
+    <delete id="deleteSysDictryCd">
+        delete from sys_dictry_cd where blngto_dictry_id = #{blngtoDictryId}
+    </delete>
+
+    <delete id="deleteSysDictryCdById">
+        delete from sys_dictry_cd where blngto_dictry_id = #{blngtoDictryId} and dictry_id=#{dictryId}
+    </delete>
+
+    <delete id="deleteSysDictryCdValue">
+        delete from sys_dictry_cd where blngto_dictry_id = #{blngtoDictryId} and cd_typ='SYS0102'
+    </delete>
+
+    <insert id="insertSysDictryCdBatch">
+        insert into sys_dictry_cd (dictry_id,dictry_nm,pare_dictry_id,blngto_dictry_id,cd_typ,dictry_comnt)
+        values
+        <foreach collection="dicList" index="index" item="dic" separator=",">
+            (#{dic.dictryId},#{dic.dictryNm},#{dic.pareDictryId},#{dic.blngtoDictryId},#{dic.cdTyp},#{dic.dictryComnt})
+        </foreach>
+    </insert>
+
+    <select id="updateSysDictryCd">
+        update sys_dictry_cd set
+        dictry_id=#{sysDictryCd.dictryId},
+        dictry_nm=#{sysDictryCd.dictryNm},
+        pare_dictry_id=#{sysDictryCd.pareDictryId},
+        blngto_dictry_id=#{sysDictryCd.dictryId},
+        cd_typ=#{sysDictryCd.cdTyp},
+        dictry_comnt=#{sysDictryCd.dictryComnt}
+        where
+          blngto_dictry_id=#{sysDictryCd.blngtoDictryId}
+        and
+          dictry_id=#{sysDictryCd.blngtoDictryId}
+    </select>
+
+    <select id="updateSysDictryCdValue">
+        update sys_dictry_cd set
+        dictry_id=#{sysDictryCd.dictryId},
+        dictry_nm=#{sysDictryCd.dictryNm},
+        pare_dictry_id=#{sysDictryCd.pareDictryId},
+        blngto_dictry_id=#{sysDictryCd.blngtoDictryId},
+        cd_typ=#{sysDictryCd.cdTyp},
+        dictry_comnt=#{sysDictryCd.dictryComnt}
+        where
+        blngto_dictry_id=#{sysDictryCd.blngtoDictryId}
+        and
+        dictry_id=#{old_id}
+    </select>
+
+    <select id="listDrawById" resultMap="DrawResultMap" parameterType="string">
+        select distinct
+            s.blngto_dictry_id as dictryId,
+            t.en_nm as tableEnNm,
+            t.cn_nm as tableCnNm,
+            t.DATA_SORC_ID as dataSorcId,
+            f.FIELD_EN_NM as fieldEnNm,
+            f.FIELD_CN_NM as fieldCnNm
+        from DIF_FIELD_DF f left join sys_dictry_cd s on s.blngto_dictry_id = f.DICTRY_CD left
+        join DIF_TABL_DF t on t.TABL_ID=f.TABL_ID where s.blngto_dictry_id = #{blngtoDictryId}
+    </select>
+
+
+    <update id="updSysDictryCdByDicId" parameterType="com.scrcu.sys.entity.SysDictryCd">
+      update sys_dictry_cd set dictry_nm=#{dictryNm},blngto_dictry_id=#{blngtoDictryId},dictry_comnt=#{dictryComnt} where
+      dictry_id=#{dictryId} and blngto_dictry_id=#{blngtoDictryId}
+    </update>
+    <delete id="delSysDictryCdByDicId" parameterType="string">
+        delete from sys_dictry_cd where dictry_id=#{dictryId} and blngto_dictry_id = #{blngtoDictryId}
+    </delete>
+    <select id="countFieldByDicId" parameterType="string" resultType="int">
+        select count(FIELD_ID) from DIF_FIELD_DF where DICTRY_CD = #{blngtoDictryId}
+    </select>
+    <delete id="delSysDicsByDicId" parameterType="string">
+        delete from sys_dictry_cd where dictry_id=#{dictryId} and blngto_dictry_id = #{dictryId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrcu.sys.mapper.SysOperLogMapper">
+
+    <resultMap id="baseMap" type="com.scrcu.sys.entity.SysOperlog">
+        <result column="id" property="id"/>
+        <result column="oper_tm" property="operTm"/>
+        <result column="operator" property="operator"/>
+        <result column="oper_ip" property="operIp"/>
+        <result column="oper_typ" property="operTyp"/>
+        <result column="obj_id" property="objId"/>
+        <result column="operation" property="operation"/>
+    </resultMap>
+
+    <select id="getSysOperLog" resultMap="baseMap">
+        select a.id,a.oper_tm,a.operator,a.oper_ip,a.oper_typ,a.operation,b.blngto_org_no as obj_id from
+        (select id,oper_tm,operator,oper_ip,oper_typ,operation from sys_operlog
+            where 1=1
+            <if test="sysOperLog.operTm != null and sysOperLog.operTm != ''">
+              and oper_tm &gt; #{sysOperLog.operTm}
+            </if>
+            <if test="sysOperLog.operIp != null and sysOperLog.operIp != ''">
+              and oper_tm &lt; #{sysOperLog.operIp}
+            </if>
+            <if test="sysOperLog.operTyp != null and sysOperLog.operTyp != ''">
+              and oper_typ = #{sysOperLog.operTyp}
+            </if>
+            order by oper_tm DESC ) as a left join sys_user as b on a.operator=b.user_id
+        where 1=1
+        <if test="sysOperLog.objId != null and sysOperLog.objId != ''">
+            and b.blngto_org_no = #{sysOperLog.objId}
+        </if>
+    </select>
+
+</mapper>

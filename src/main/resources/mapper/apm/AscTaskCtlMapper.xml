@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrcu.apm.ascTaskCtl.mapper.AscTaskCtlMapper">
+    <delete id="deleteByBatch" parameterType="string">
+        DELETE FROM asc_taskctl WHERE task_id=#{taskId};
+        DELETE FROM asc_dependcfg WHERE TASK_ID=#{taskId};
+        DELETE FROM asc_triggercfg WHERE TASK_ID=#{taskId};
+    </delete>
+</mapper>
+

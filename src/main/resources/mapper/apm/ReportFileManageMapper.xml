@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrcu.apm.mapper.ReportFileManageMapper">
+    <resultMap id="RptFileCrtRecord" type="com.scrcu.apm.entity.RptFileCrtRecord">
+        <result property="id" column="ID"></result>
+        <result property="mansbjId" column="MANSBJ_ID"></result>
+        <result property="objId" column="OBJ_ID"></result>
+        <result property="objTyp" column="OBJ_TYP"></result>
+        <result property="fileNmCn" column="FILE_NM_CN"></result>
+        <result property="fileNm" column="FILE_NM"></result>
+        <result property="filePath" column="FILE_PATH"></result>
+        <result property="batchDt" column="BATCH_DT"></result>
+        <result property="fileCrtDt" column="FILE_CRT_DT"></result>
+        <result property="fileCrtTm" column="FILE_CRT_TM"></result>
+        <result property="rptIsDownload" column="RPT_IS_DOWNLOAD"></result>
+        <result property="rptIsSubmit" column="RPT_IS_SUBMIT"></result>
+        <result property="lstDownloader" column="LST_DOWNLOADER"></result>
+        <result property="lstDownloadTm" column="LST_DOWNLOAD_TM"></result>
+        <result property="lstSubmitor" column="LST_SUBMITOR"></result>
+        <result property="lstSubmitTm" column="LST_SUBMIT_TM"></result>
+        <result property="crtBatchId" column="CRT_BATCH_ID"></result>
+        <result property="orgCd" column="ORG_CD"></result>
+        <result property="invokor" column="INVOKOR"></result>
+        <result property="downloadFlag" column="DOWNLOAD_FLG"></result>
+        <result property="rptSubmitTyp" column="RPT_SUBMIT_TYP"></result>
+        <result property="rptInterfaceTyp" column="RPT_INTERFACE_TYP"></result>
+    </resultMap>
+    <select id="getAllFileRecordsByMansbjId" resultMap="RptFileCrtRecord">
+        SELECT
+          ID,
+          A.MANSBJ_ID,
+          OBJ_ID,
+          OBJ_TYP,
+          FILE_NM_CN,
+          FILE_NM,
+          FILE_PATH,
+          BATCH_DT,
+          FILE_CRT_DT,
+          FILE_CRT_TM,
+          RPT_IS_DOWNLOAD,
+          RPT_IS_SUBMIT,
+          LST_DOWNLOADER,
+          LST_DOWNLOAD_TM,
+          LST_SUBMITOR,
+          LST_SUBMIT_TM,
+          CRT_BATCH_ID,
+          ORG_CD,
+          INVOKOR,
+          DOWNLOAD_FLG,
+          RPT_SUBMIT_TYP,
+          RPT_INTERFACE_TYP
+        FROM
+          RPT_FILE_CRT_RECORD AS A LEFT JOIN RPT_MANSBJ_DEF AS B ON A.MANSBJ_ID=B.MANSBJ_ID
+        WHERE  1=1
+          <if test="record.crtBatchId != ''and record.crtBatchId != null">
+              AND A.CRT_BATCH_ID = #{record.crtBatchId}
+          </if>
+          <if test="record.fileCrtDt_start != ''and record.fileCrtDt_start != null">
+              AND A.FILE_CRT_DT &gt;= #{record.fileCrtDt_start}
+          </if>
+          <if test="record.fileCrtDt_end != ''and record.fileCrtDt_end != null">
+              AND A.FILE_CRT_DT &lt;= #{record.fileCrtDt_end}
+          </if>
+          <if test="record.fileCrtTm_start != ''and record.fileCrtTm_start != null">
+              AND A.FILE_CRT_TM &gt;= #{record.fileCrtTm_start}
+          </if>
+          <if test="record.fileCrtTm_end != ''and record.fileCrtTm_end != null">
+              AND A.FILE_CRT_TM &lt;= #{record.fileCrtTm_end}
+          </if>
+          <if test="record.rptSubmitTyp != ''and record.rptSubmitTyp != null">
+              AND B.RPT_SUBMIT_TYP = #{record.rptSubmitTyp}
+          </if>
+          <if test="record.lstSubmitTm_start != ''and record.lstSubmitTm_start != null">
+              AND A.LST_SUBMIT_TM &gt;= #{record.lstSubmitTm_start}
+          </if>
+          <if test="record.lstSubmitTm_end != ''and record.lstSubmitTm_end != null">
+              AND A.LST_SUBMIT_TM &lt;= #{record.lstSubmitTm_end}
+          </if>
+          AND A.MANSBJ_ID IN
+          <foreach collection="mansbjIdList" index="index" item="mansbjId" open="(" separator="," close=")">
+              #{mansbjId}
+          </foreach>
+          AND A.ORG_CD IN
+          <foreach collection="orgList" index="index" item="org" open="(" separator="," close=")">
+              #{org.code}
+          </foreach>
+    </select>
+
+</mapper>

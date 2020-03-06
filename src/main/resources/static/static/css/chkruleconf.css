@@ -1,0 +1,16 @@
+.rowDiv{
+    margin-top: 20px;
+}
+.rowSpan{
+    margin-left: 10%;
+}
+.ruleText{
+    width:250px;
+    height: 30px;
+    border: 1px solid rgba(255, 168, 168, 1);
+    border-radius: 5px;
+}
+.ruleArea{
+    width:91%;
+    height: 80px;
+}

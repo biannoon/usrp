@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrcu.sys.mapper.SysRoleMapper">
+
+    <resultMap id="SysRole" type="com.scrcu.sys.entity.SysRole">
+        <result property="roleId" column="role_id"></result>
+        <result property="roleNm" column="role_nm"></result>
+        <result property="roleHrchCd" column="role_hrch_cd"></result>
+        <result property="roleComnt" column="role_comnt"></result>
+        <result property="sys" column="sys"></result>
+    </resultMap>
+
+    <resultMap id="User" type="com.scrcu.sys.entity.SysUser">
+        <result property="userId" column="user_id"></result>
+        <result property="userNm" column="user_nm"></result>
+        <result property="blngtoOrgNo" column="blngto_org_no"></result>
+        <result property="stus" column="stus"></result>
+        <result property="telNo" column="tel_no"></result>
+    </resultMap>
+
+    <select id="selectRoleList" parameterType="com.scrcu.sys.entity.SysRole" resultMap="SysRole">
+        select S.role_id, S.role_nm, S.role_hrch_cd,S.role_comnt ,S.sys from  sys_role S left join sys_user_role_rel B on S.role_id=B.role_id
+        where B.user_id=#{sysRole.creatr}
+        <if test="sysRole.roleNm != null and sysRole.roleNm != ''">
+            and S.role_nm  like concat('%',#{sysRole.roleNm},'%')
+        </if>
+        <if test="sysRole.roleHrchCd != null and sysRole.roleHrchCd != ''">
+            and S.role_hrch_cd = #{sysRole.roleHrchCd}
+        </if>
+        order by role_id desc
+    </select>
+
+    <!--pengjuntao-->
+    <select id="getSysUserByRole" resultMap="User">
+        select c.user_id,c.user_nm,d.org_nm AS blngto_org_no,c.stus,c.tel_no
+        from
+        (select b.user_id,b.user_nm,b.blngto_org_no,b.stus,b.tel_no
+        from
+        sys_user_role_rel as a left join sys_user as b on a.user_id=b.user_id
+        where 1=1
+        <if test="role.roleId != null and role.roleId != ''">
+            and a.role_id = #{role.roleId}
+        </if>
+        <if test="role.roleId == null or role.roleId == ''">
+            and a.role_id = '-1'
+        </if>
+        <if test="user.userNm != null and user.userNm != ''">
+            and b.user_nm = #{user.userNm}
+        </if>
+        ) as c left join sys_org_info as d on c.blngto_org_no=d.org_cd
+        WHERE 1=1
+        <if test="user.blngtoOrgNo != null and user.blngtoOrgNo != ''">
+            and d.org_nm like concat('%',#{user.blngtoOrgNo},'%')
+        </if>
+    </select>
+    
+    <select id="getUserUnderRole" resultMap="User">
+        select b.user_id,b.user_nm from sys_user_role as a left sys_user as b on a.user_id=b.user_id where a.role_id=#{roleId}
+    </select>
+</mapper>

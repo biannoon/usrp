@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrcu.apm.mapper.SysTabConfigMapper">
+
+    <resultMap id="DifTablDf" type="com.scrcu.apm.dataport.entity.DifTableDf">
+        <result property="tablId" column="TABL_ID"></result>
+        <result property="cnNm" column="CN_NM"></result>
+        <result property="enNm" column="EN_NM"></result>
+        <result property="dataSorcId" column="DATA_SORC_ID"></result>
+        <result property="tablTyp" column="TABL_TYP"></result>
+        <result property="tablStus" column="TABL_STUS"></result>
+        <result property="bizClsf" column="BIZ_CLSF"></result>
+        <result property="creatr" column="CREATR"></result>
+        <result property="crtDt" column="CRT_DT"></result>
+        <result property="finlModifr" column="FINL_MODIFR"></result>
+        <result property="finlModfyDt" column="FINL_MODFY_DT"></result>
+    </resultMap>
+
+    <select id="listDifTablDf" parameterType="com.scrcu.apm.dataport.entity.DifTableDf" resultMap="DifTablDf">
+        select
+          TABL_ID,CN_NM,EN_NM,DATA_SORC_ID,TABL_TYP,TABL_STUS,BIZ_CLSF,CREATR,CRT_DT,FINL_MODIFR,FINL_MODFY_DT
+        from dif_tabl_df where 1=1
+        <if test="difTableDf.cnNm != null and difTableDf.cnNm != ''">
+            and CN_NM LIKE CONCAT('%',#{difTableDf.cnNm},'%')
+        </if>
+        <if test="difTableDf.enNm != null and difTableDf.enNm != ''">
+            and EN_NM LIKE CONCAT('%',#{difTableDf.enNm},'%')
+        </if>
+        <if test="difTableDf.dataSorcId != null and difTableDf.dataSorcId != ''">
+            and DATA_SORC_ID = #{difTableDf.dataSorcId}
+        </if>
+        <if test="difTableDf.tablStus != null and difTableDf.tablStus != ''">
+            and TABL_STUS = #{difTableDf.tablStus}
+        </if>
+        <if test="difTableDf.bizClsf != null and difTableDf.bizClsf != ''">
+            and BIZ_CLSF = #{difTableDf.bizClsf}
+        </if>
+        ORDER BY CRT_DT DESC
+    </select>
+
+</mapper>

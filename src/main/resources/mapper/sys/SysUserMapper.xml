@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrcu.sys.mapper.SysUserMapper">
+
+    <select id="findFromSysOemEmply">
+        select oa_no,emply_nm,gender_cd,brithdy,addr,
+        case when mobilie_no is not null then mobile_no
+        else (case when office_tel_no is not null then office_tel_no
+        else (case when home_tel_no is not null then home_tel_no else '' end) end) end tel_no
+        from sys_oem_emply where oa_no=#{userId}
+    </select>
+
+    <resultMap id="SysUser" type="com.scrcu.sys.entity.SysUser">
+        <result property="userId" column="user_id"></result>
+        <result property="userNm" column="user_nm"></result>
+        <result property="blngtoOrgNo" column="blngto_org_no"></result>
+        <result property="stus" column="stus"></result>
+        <result property="telNo" column="tel_no"></result>
+    </resultMap>
+
+    <resultMap id="SysOrganization" type="com.scrcu.sys.entity.SysOrganization">
+        <result property="id" column="org_id"></result>
+        <result property="name" column="org_nm"></result>
+        <result property="superiorId" column="spr_org_id"></result>
+        <result property="gradationCode" column="org_grdtn_cd"></result>
+        <result property="code" column="org_cd"></result>
+    </resultMap>
+
+    <!--pengjuntao-->
+    <select id="getSysUserByCommon" resultMap="SysUser">
+        select a.USER_ID,USER_NM,BLNGTO_ORG_NO,STUS
+        from sys_user as a left join sys_user_role_rel as b on a.user_id=b.user_id where 1 = 1
+        <if test="user.creatr != null and user.creatr != ''">
+            and role_id = #{user.creatr}
+        </if>
+        <if test="user.finlModifr != null and user.finlModifr != ''">
+            and a.user_id = #{user.finlModifr}
+        </if>
+        <if test="user.userNm != null and user.userNm != ''">
+            and USER_NM like CONCAT('%',#{user.userNm},'%')
+        </if>
+        <if test="user.blngtoOrgNo != null and user.blngtoOrgNo != ''">
+            and BLNGTO_ORG_NO = #{user.blngtoOrgNo}
+        </if>
+        <if test="user.stus != null and user.stus != ''">
+            and STUS != #{user.stus}
+        </if>
+        <if test="user.telNo != null and user.telNo != ''">
+            and BLNGTO_ORG_NO IN
+            <foreach collection="orgList" index="index" item="org" open="(" separator="," close=")">#{org.code}</foreach>
+        </if>
+    </select>
+
+   <!--pengjuntao
+   <select id="getSysOrgInfoFromUser" parameterType="com.scrcu.sys.entity.SysUser" resultMap="SysOrganization">
+        select
+            org_id,
+            org_nm,
+            spr_org_id,
+            org_grdtn_cd,
+            org_cd
+        from (select RECOURS_ID from sys_user_group_rel as a LEFT JOIN sys_group_recours_rel as b on a.GROUP_ID=b.GROUP_ID where a.USER_ID=#{userId} and b.RECOURS_TYP="SYS1101") as d
+        LEFT JOIN sys_org_info as c on c.org_id=d.RECOURS_ID
+    </select>-->
+
+    <select id="getNextLvlSysOrgInfoFromUser" parameterType="com.scrcu.sys.entity.SysOrganization" resultMap="SysOrganization">
+        select
+        org_id,
+        org_nm,
+        spr_org_id,
+        org_grdtn_cd,
+        org_cd
+        from sys_org_info where org_grdtn_cd like CONCAT(#{gradationCode},"%");
+    </select>
+
+
+    <select id="selectUserList" parameterType="com.scrcu.sys.entity.SysUser" resultMap="SysUser">
+        select S.user_id, S.user_nm, S.stus,O.org_nm as blngto_org_no,S.tel_no from  sys_user S left join sys_user_role_rel B on S.user_id=B.user_id
+         left join sys_org_info O on O.org_cd = S.blngto_org_no   where B.role_id=#{sysUser.telNo}
+        <if test="sysUser.userNm != null and sysUser.userNm != ''">
+            and S.user_nm  like concat('%',#{sysUser.userNm},'%')
+        </if>
+        <if test="sysUser.stus != null and sysUser.stus != ''">
+            and S.stus = #{sysUser.stus}
+        </if>
+        order by user_id desc
+    </select>
+    <delete id="deleteUserRoleRel" parameterType="string">
+        delete from sys_user_role_rel where user_id = #{userId}
+    </delete>
+    <delete id="deleteUserGroupRel" parameterType="string">
+        delete from sys_user_group_rel where user_id = #{userId}
+    </delete>
+
+    <select id="selectPageList" parameterType="com.scrcu.sys.entity.SysUser" resultMap="SysUser">
+        select S.user_id, S.user_nm, S.stus,O.org_nm as blngto_org_no,S.tel_no from  sys_user S
+        left join sys_org_info O on O.org_cd = S.blngto_org_no   where 1=1
+        <if test="sysUser.userNm != null and sysUser.userNm != ''">
+            and S.user_nm  like concat('%',#{sysUser.userNm},'%')
+        </if>
+        <if test="sysUser.stus != null and sysUser.stus != ''">
+            and S.stus = #{sysUser.stus}
+        </if>
+        <if test="sysUser.userId != null and sysUser.userId != ''">
+            and S.user_id  like concat('%',#{sysUser.userId},'%')
+        </if>
+        <if test="sysUser.blngtoOrgNo != null and sysUser.blngtoOrgNo != ''">
+            and O.org_nm  like concat('%',#{sysUser.blngtoOrgNo},'%')
+        </if>
+        order by user_id desc
+    </select>
+
+    <!--pengjuntao-->
+    <select id="selectPageList_rewrite" resultMap="SysUser">
+        select a.user_id,a.user_nm,a.stus,b.org_nm as blngto_org_no,a.tel_no
+        from sys_user as a left join sys_org_info as b on a.blngto_org_no = b.org_cd
+        where 1 = 1
+        <if test="sysUser.userId != null and sysUser.userId != ''">
+            and user_id = #{sysUser.userId}
+        </if>
+        <if test="sysUser.userNm != null and sysUser.userNm != ''">
+            and user_nm like concat('%',#{sysUser.userNm},'%')
+        </if>
+        <if test="sysUser.blngtoOrgNo != null and sysUser.blngtoOrgNo != ''">
+            and b.org_nm like concat('%',#{sysUser.blngtoOrgNo},'%')
+        </if>
+        <if test="sysUser.stus != null and sysUser.stus != ''">
+            and stus = #{sysUser.stus}
+        </if>
+        <if test="orgList != null and orgList.size != 0">
+            and blngto_org_no in (
+            <foreach collection="orgList" index="index" item="org" open="" separator="," close="">
+                #{org.code}
+            </foreach>
+            )
+        </if>
+        order by user_id desc
+    </select>
+
+
+    <select id="selectMaxId" resultType="string">
+        select max(id) from ${table}
+    </select>
+
+
+    <insert id="insertUserRole_re">
+        insert into sys_user_role_rel(id,user_id,role_id) values
+        <foreach collection="relList" item="rel" index="index" open="" separator="," close="">
+            (#{rel.id},#{rel.userId},#{rel.roleId})
+        </foreach>
+    </insert>
+
+    <insert id="insertUserGroup_re">
+        insert into sys_user_group_rel(id,user_id,group_id) values
+        <foreach collection="relList" item="rel" index="index" open="" separator="," close="">
+            (#{rel.id},#{rel.userId},#{rel.groupId})
+        </foreach>
+    </insert>
+
+</mapper>

@@ -1,0 +1,14 @@
+.query-wrap{ height: 72px; width: 980px;}
+.query-low-wrap{ height: 36px; width: 980px;}
+.query-item{float: left; width: 310px; height: 30px; line-height: 30px;color: #333; font-size: 12px;margin: 3px 5px;}
+.query-item-button{float: left; width: 310px; height: 30px; line-height: 30px;color: #333; margin: 3px 5px;}
+
+.edit-win-div-row{margin-top: 5px; height: 30px;}
+.edit-win-div-row-column{float: left;}
+.edit-win-div-row-column-label{width: 100px; text-align: right; display: inline-block;}
+.edit-win-div-row-column-long-label{width: 150px; text-align: right; display: inline-block;}
+
+.edit-win-div-row-button{margin-top: 10px; padding-right: 20px; text-align: right;}
+
+.win-div-row{height: auto; width: 100%;}
+.win-div-row-column{float: left; display: inline-block;}
